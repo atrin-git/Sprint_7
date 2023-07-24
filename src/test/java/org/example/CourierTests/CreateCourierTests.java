@@ -19,7 +19,7 @@ public class CreateCourierTests {
 
     public CreateCourierTests() {
         testData = new HashMap<>();
-        testData.put("login", "testLoginNewCourier");
+        testData.put("login", "testLogin_" + this.getClass().getName());
         testData.put("password", "1234");
         testData.put("firstName", "saske");
     }
