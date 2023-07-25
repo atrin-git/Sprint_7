@@ -2,150 +2,99 @@ package org.example.CourierTests;
 
 import io.qameta.allure.*;
 import io.qameta.allure.junit4.*;
-import io.qameta.allure.restassured.AllureRestAssured;
-import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static io.restassured.RestAssured.responseSpecification;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.IsEqual.equalTo;
-
-@Issue("2")
+@Link(url = "https://qa-scooter.praktikum-services.ru/docs/#api-Courier-Login", name = "#api-Courier-Login")
 @Tag("login-courier")
+@Epic("Sprint 7. Project")
+@Feature("Группа тестов для API логина курьера")
 @DisplayName("2. Логин курьера")
-public class LoginCourierTests {
-    private final Map<String,String> testData;
+public class LoginCourierTests extends CourierAPITests{
+    private final String login;
+    private final String password;
+    private final String firstName;
 
     public LoginCourierTests() {
-        testData = new HashMap<>();
-        testData.put("login", "testLogin_" + this.getClass().getName());
-        testData.put("password", "1234");
-        testData.put("firstName", "saske");
+        login = "courier_" + this.getClass().getSimpleName();
+        password = "1234";
+        firstName = "Name";
     }
 
-//    @BeforeClass
-//    public static void beforeAll() {
-//        RestAssured.requestSpecification = new RequestSpecBuilder().build().filter(new AllureRestAssured());
-//    }
-
     @Before
+    @Step("Подготовка данных для тестирования")
     public void prepareTestData() {
-        CourierAPIHelper.createCourier(new Courier(
-                testData.get("login"),
-                testData.get("password"),
-                testData.get("firstName")
-        ));
+        createCourier(login, password, firstName);
     }
 
     @After
+    @Step("Очистка данных после теста")
     public void clearAfterTests() {
-        Response response = CourierAPIHelper.loginCourier(new Courier(
-                testData.get("login"),
-                testData.get("password")
-        ));
-
-        Integer idCourier = response.body().as(CourierLoginResponse.class).getId();
-
+        Integer idCourier = getIdCourier(loginCourier(login, password));
         if (idCourier == null) return;
 
-        CourierAPIHelper.deleteCourier(idCourier);
+        deleteCourier(idCourier);
     }
 
     @Test
     @DisplayName("Логин курьера в систему")
     @Description("Тест проверяет API логина курьера. Ожидаемый результат - курьер залогинен в системе, возвращается его id")
     public void loginCourierIsSuccess() {
+        Response response = loginCourier(login,password);
 
-        Allure.step("Логин курьера в систему");
-        Response response = CourierAPIHelper.loginCourier(new Courier(
-                testData.get("login"),
-                testData.get("password")
-        ));
-
-        response.then().statusCode(200).and().assertThat().body("id", notNullValue());
+        checkStatusCode(response, 200);
+        checkCourierIDNotNull(response);
     }
 
     @Test
     @DisplayName("Логин курьера в систему без входных данных")
     @Description("Тест проверяет API логина курьера без входных данных. Ожидаемый результат - курьер НЕ залогинен в системе")
     public void loginCourierMissingAllParamsIsFailed() {
-        Courier courier = new Courier(
-                "",
-                ""
-        );
+        Response response = loginCourier("", "");
 
-        CourierAPIHelper.loginCourier(courier)
-                .then().statusCode(400)
-                .and()
-                .assertThat().body("message", equalTo("Недостаточно данных для входа"));
-
+        checkStatusCode(response, 400);
+        checkMessage(response, "message", "Недостаточно данных для входа");
     }
 
     @Test
     @DisplayName("Логин курьера в систему без логина")
     @Description("Тест проверяет API логина курьера без логина. Ожидаемый результат - курьер НЕ залогинен в системе")
     public void loginCourierMissingLoginParamIsFailed() {
-        Courier courier = new Courier(
-                "",
-                testData.get("password")
-        );
+        Response response = loginCourier("", password);
 
-        CourierAPIHelper.loginCourier(courier)
-                .then().statusCode(400)
-                .and()
-                .assertThat().body("message", equalTo("Недостаточно данных для входа"));
+        checkStatusCode(response, 400);
+        checkMessage(response, "message", "Недостаточно данных для входа");
     }
 
     @Test
     @DisplayName("Логин курьера в систему без пароля")
     @Description("Тест проверяет API логина курьера без пароля. Ожидаемый результат - курьер НЕ залогинен в системе")
     public void loginCourierMissingPasswordParamIsFailed() {
-        Courier courier = new Courier(
-                testData.get("login"),
-                ""
-        );
+        Response response = loginCourier(login, "");
 
-        CourierAPIHelper.loginCourier(courier)
-                .then().statusCode(400)
-                .and()
-                .assertThat().body("message", equalTo("Недостаточно данных для входа"));
+        checkStatusCode(response, 400);
+        checkMessage(response, "message", "Недостаточно данных для входа");
     }
 
     @Test
     @DisplayName("Логин курьера в систему с некорректным логином")
     @Description("Тест проверяет API логина курьера с некорректным логином. Ожидаемый результат - курьер НЕ залогинен в системе")
     public void loginCourierIncorrectLoginParamIsFailed() {
-        Courier courier = new Courier(
-                testData.get("login") + "_incorrect",
-                testData.get("password")
-        );
+        Response response = loginCourier(login + "1", password);
 
-        CourierAPIHelper.loginCourier(courier)
-                .then().statusCode(404)
-                .and()
-                .assertThat().body("message", equalTo("Учетная запись не найдена"));
+        checkStatusCode(response, 404);
+        checkMessage(response, "message", "Учетная запись не найдена");
     }
 
     @Test
     @DisplayName("Логин курьера в систему с некорректным паролем")
     @Description("Тест проверяет API логина курьера с некорректным паролем. Ожидаемый результат - курьер НЕ залогинен в системе")
     public void loginCourierIncorrectPasswordParamIsFailed() {
-        Courier courier = new Courier(
-                testData.get("login"),
-                testData.get("password") + "_incorrect"
-        );
+        Response response = loginCourier(login, password + "1");
 
-        CourierAPIHelper.loginCourier(courier)
-                .then().statusCode(404)
-                .and()
-                .assertThat().body("message", equalTo("Учетная запись не найдена"));
+        checkStatusCode(response, 404);
+        checkMessage(response, "message", "Учетная запись не найдена");
     }
 }
