@@ -4,12 +4,10 @@ import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import io.restassured.response.*;
 
-import java.io.InputStream;
-
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public abstract class CourierAPITests {
+public class CourierAPITests {
 
     private final CourierHTTPClient courierHTTPClient = new CourierHTTPClient();
 
@@ -52,40 +50,6 @@ public abstract class CourierAPITests {
         Allure.addAttachment("Ответ", response.getBody().asInputStream());
         response.then().assertThat().body("id", notNullValue());
     }
-
-    //@Step("Получение кода ответа")
-//    public Integer getStatusCode(Response response) {
-//        return response.getStatusCode();
-//    }
-
-    //@Step("Получение тела ответа")
-//    public CourierAPIResponse getResponseBody(Response response) {
-//        return response.getBody().as(CourierAPIResponse.class);
-//    }
-//
-//    @Step("Проверка кода ответа")
-//    public void assertStatusCode(Response response, int code) {
-//        MatcherAssert.assertThat("Коды не совпадают",
-//                response.getStatusCode(),
-//                equalTo(code)
-//        );
-//    }
-//
-//    @Step("Проверка ok: true")
-//    public void assertResponseOk(Response response) {
-//        MatcherAssert.assertThat("Не вернулся ответ ok: true",
-//                response.body().as(CourierAPIResponse.class).getOk(),
-//                equalTo(true)
-//        );
-//    }
-
-//    @Step("Проверка сообщения в message")
-//    public void assertResponseMessage(Response response, String expectedMessage) {
-//        MatcherAssert.assertThat("Текст сообщения в message некорретный",
-//                response.body().as(CourierAPIResponse.class).getMessage(),
-//                equalTo(expectedMessage)
-//        );
-//    }
 
     public boolean isCourierCreated(Response response, int code) {
         if (response.getStatusCode() != code) return false;

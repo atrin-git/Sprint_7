@@ -12,13 +12,6 @@ import static io.restassured.RestAssured.given;
 
 public abstract class BaseHTTPClient {
 
-    public Response doPostRequest(String url, Object requestBody) {
-        return given(this.baseRequest())
-                .body(requestBody)
-                .when()
-                .post(url);
-    }
-
     public Response doPostRequest(String url, Object requestBody, String contentType) {
         return given(this.baseRequest(contentType))
                 .body(requestBody)

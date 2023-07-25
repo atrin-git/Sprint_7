@@ -30,16 +30,4 @@ public class OrdersHTTPClient extends BaseHTTPClient {
         return doGetRequest(ScooterUrls.HOST_NAME + ScooterUrls.GET_ORDERS_LIST);
     }
 
-    public Response getOrdersList(Integer courierId, String nearestStation, Integer limit, Integer page) {
-        Map<String, Object> queryParams = new HashMap<>();
-        queryParams.put("courierId", courierId);
-        queryParams.put("nearestStation", nearestStation);
-        queryParams.put("limit", limit);
-        queryParams.put("page", page);
-
-        return doPutRequest(
-                ScooterUrls.HOST_NAME + ScooterUrls.GET_ORDERS_LIST,
-                queryParams
-        );
-    }
 }

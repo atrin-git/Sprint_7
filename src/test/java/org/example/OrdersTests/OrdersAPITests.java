@@ -1,14 +1,12 @@
 package org.example.OrdersTests;
 
 import io.qameta.allure.Allure;
-import io.qameta.allure.Attachment;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.core.IsEqual.equalTo;
 
 public class OrdersAPITests {
 
@@ -32,15 +30,10 @@ public class OrdersAPITests {
         response.then().statusCode(code);
     }
 
-    @Step("Проверка тела ответа")
-    public void checkMessage(Response response, String label, Object body) {
-        Allure.addAttachment("Ответ", response.getBody().asInputStream());
-        response.then().assertThat().body(label, equalTo(body));
-    }
     @Step("Проверка, что track-номер заказа вернулся")
     public void checkResponseParamNotNull(Response response, String label) {
         Allure.addAttachment("Ответ", response.getBody().asInputStream());
-        response.then().assertThat().body("track", notNullValue());
+        response.then().assertThat().body(label, notNullValue());
     }
 
     @Step("Получение track-номера заказа")
@@ -52,12 +45,6 @@ public class OrdersAPITests {
     public Response getOrdersList() {
         return ordersHTTPClient.getOrdersList();
     }
-
-    @Step("Отправка запроса на получение списка заказов")
-    public Response getOrdersList(Integer courierId, String nearestStation, Integer limit, Integer page) {
-        return ordersHTTPClient.getOrdersList();
-    }
-
 
     @Step("Проверка наличия заказов в теле ответа")
     public void checkOrdersInResponse(Response response) {

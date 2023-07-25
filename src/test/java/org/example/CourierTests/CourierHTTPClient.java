@@ -24,6 +24,5 @@ public class CourierHTTPClient extends BaseHTTPClient {
 
     public Response deleteCourier(Integer idCourier) {
         return doDeleteRequest(ScooterUrls.HOST_NAME + ScooterUrls.DELETE_COURIER + idCourier);
-
     }
 }
